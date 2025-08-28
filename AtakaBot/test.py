@@ -1,4 +1,6 @@
 import pymorphy3
+from rusgenderdetection import get_gender
+
 
 def decline_name(name):
     """
@@ -16,9 +18,9 @@ def decline_name(name):
 if __name__ == "__main__":
     names = [
         "Alisa",
-        "Кристина",
-        "Максим",
-        "Дарья",
+        "Кристины",
+        "Максима",
+        "Дарьи",
         "Евгений",
         "Наталья",
         "Константин",
@@ -29,3 +31,13 @@ if __name__ == "__main__":
 
     for n in names:
         print(f"\nИмя: {n}, Родительный падеж: {decline_name(n).title()}")
+        print(get_gender(n))
+
+
+
+class load_data:
+    print("0")
+    def __init__(self):
+        print("1")
+
+app = load_data()
