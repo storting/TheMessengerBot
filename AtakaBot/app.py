@@ -2,9 +2,20 @@ import os
 import subprocess
 import psutil
 from time import sleep
+import sys
 
-# Укажите путь к вашей виртуальной среде
-VENV_PATH = r'venv'
+try:
+    # Получаем реальный путь к исполняемому файлу
+    EXECUTABLE_PATH = os.path.realpath(sys.executable)
+except OSError:
+    print("Ошибка определения пути к исполняемому файлу.")
+    sys.exit(1)
+
+# Поднимаемся на уровень вверх к родительской директории
+PROJECT_DIR = os.path.dirname(EXECUTABLE_PATH)
+PROJECT_DIR = os.path.dirname(PROJECT_DIR)
+
+VENV_PATH = os.path.join(PROJECT_DIR, 'venv')  # Предположим, .venv лежит в корневом каталоге проекта
 
 # Определение полного пути к интерпретатору Python в виртуальной среде
 PYTHON_EXE = os.path.join(VENV_PATH, 'Scripts', 'python.exe')
@@ -30,8 +41,8 @@ def check_process(pid):
 
 if __name__ == "__main__":
     # Запуск двух приложений в отдельных процессах
-    mailing_proc = start_app('MailingApp.py')
-    data_proc = start_app('DataApp.py')
+    mailing_proc = start_app(f'{PROJECT_DIR}\MailingApp.py')
+    data_proc = start_app(f'{PROJECT_DIR}\DataApp.py')
 
     # Сохраняем PID обоих процессов
     mail_pid = mailing_proc.pid

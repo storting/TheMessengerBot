@@ -8,6 +8,20 @@ import codecs
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
 import os
+import sys
+
+try:
+    # Получаем реальный путь к исполняемому файлу
+    EXECUTABLE_PATH = os.path.realpath(sys.executable)
+except OSError:
+    print("Ошибка определения пути к исполняемому файлу.")
+    sys.exit(1)
+
+# Поднимаемся на уровень вверх к родительской директории
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(EXECUTABLE_PATH)))  
+
+TOKEN_DIR = os.path.join(PROJECT_DIR, 'TOKEN\\token.json')
+CREDENTIALS_DIR = os.path.join(PROJECT_DIR, 'TOKEN\\credentials.json')
 
 class dataApp(tk.Tk):
     def __init__(self):
@@ -60,18 +74,18 @@ class dataApp(tk.Tk):
         """Метод для загрузки данных из Google Таблицы."""
         try:
             # Файл токенов хранится локально и используется повторно
-            if os.path.exists('token.json'):
-                self.creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+            if os.path.exists(TOKEN_DIR):
+                self.creds = Credentials.from_authorized_user_file(TOKEN_DIR, SCOPES)
             
             # Если токены устарели или отсутствуют
             if not self.creds or not self.creds.valid:
                 if self.creds and self.creds.expired and self.creds.refresh_token:
                     self.creds.refresh(Request())
                 else:
-                    flow = InstalledAppFlow.from_client_secrets_file('credentials.json', SCOPES)
+                    flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_DIR, SCOPES)
                     self.creds = flow.run_local_server(port=0)
                     
-                with open('token.json', 'w') as token:
+                with open(TOKEN_DIR, 'w') as token:
                     token.write(self.creds.to_json())
 
             service = build('sheets', 'v4', credentials=self.creds)
