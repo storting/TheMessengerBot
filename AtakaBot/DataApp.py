@@ -31,6 +31,14 @@ class dataApp(tk.Tk):
         # Кнопка для принудительного обновления данных
         button_load = tk.Button(label_frame, text="Обновить данные", command=self.fetch_spreadsheet_data, font=("Arial", 10))
         button_load.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
+                
+        # Поле для ввода сслыки на таблицу
+        self.entry_ID_google_tabs = tk.Entry(self, width=100)
+        self.entry_ID_google_tabs.insert(0, "https://docs.google.com/spreadsheets/d/116w9l5Uwar_ve0J5J92UG4ByaQZsjvJr8fLq8wGsJMo/edit?gid=0#gid=0")
+        self.entry_ID_google_tabs.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
+
+        self.label_ID_google_tabs = tk.Label(self, text="Введите сслыку на таблицу:")
+        self.label_ID_google_tabs.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
 
     def load_saved_data(self):
         """Проверяем наличие файла с данными и показываем их, если они есть."""
@@ -69,7 +77,10 @@ class dataApp(tk.Tk):
             service = build('sheets', 'v4', credentials=self.creds)
 
             # ID таблицы (из URL Гугл-документа)
-            SAMPLE_SPREADSHEET_ID = '116w9l5Uwar_ve0J5J92UG4ByaQZsjvJr8fLq8wGsJMo'
+            try:
+                SAMPLE_SPREADSHEET_ID = self.extract_id()
+            except:
+                messagebox.showerror("Ошибка ввода ссылки", "Необходимо ввести ссылку на таблицу")
             
             # Диапазон чтения (например, лист A1:C10)
             SAMPLE_RANGE_NAME = 'Лист1!A2:N3177'
@@ -104,6 +115,13 @@ class dataApp(tk.Tk):
                     filtered_row = row[:9] + row[11:]
                     self.output_text.insert(tk.END, f'{idx}. {filtered_row}\n\n')
             self.output_text.config(state=tk.DISABLED)
+            print("Data upload successful")
+
+    def extract_id(self):
+        url = self.entry_ID_google_tabs.get() 
+        parts = url.split('/')  # Разбиваем ссылку на части по символу '/'
+        id_part = parts[5]      # Берём шестой элемент списка (нумерация начинается с нуля)
+        return id_part          # Возвращаем извлечённый ID
 
 # Список разрешений
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']

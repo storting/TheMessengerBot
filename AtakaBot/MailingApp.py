@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime, timedelta
 import codecs
-import SendMessege
+import SendMessage as SendMessage
 
 class mailingApp(tk.Tk):
     def __init__(self):
@@ -15,10 +15,10 @@ class mailingApp(tk.Tk):
         """Создание элементов интерфейса."""
         label_start = tk.Label(self, text="Начальная дата:")
         self.entry_start = tk.Entry(self)
-        self.entry_start.insert(0, "01.01.2022")
+        self.entry_start.insert(0, "01/01/2022")
         label_end = tk.Label(self, text="Конечная дата:")
         self.entry_end = tk.Entry(self)
-        self.entry_end.insert(0, "01.01.2022")
+        self.entry_end.insert(0, "01/01/2022")
         button_process = tk.Button(self, text="Разослать", command=self.process_dates)
 
         # Расположение элементов
@@ -30,7 +30,7 @@ class mailingApp(tk.Tk):
         self.result_text.grid(row=3, columnspan=2)
 
     def process_dates(self):
-        SendMessege.driverOpen()
+        SendMessage.driverOpen()
         """Обработка вводимых дат и отправка сообщений."""
         # Получаем введённые даты
         start_date_str = self.entry_start.get()
@@ -43,10 +43,10 @@ class mailingApp(tk.Tk):
         
         # Преобразование дат
         try:
-            start_date = datetime.strptime(start_date_str, "%d.%m.%Y")
-            end_date = datetime.strptime(end_date_str, "%d.%m.%Y")
+            start_date = datetime.strptime(start_date_str, "%d/%m/%Y")
+            end_date = datetime.strptime(end_date_str, "%d/%m/%Y")
         except ValueError:
-            messagebox.showerror("Ошибка", "Неправильный формат даты. Используйте dd.mm.yyyy.")
+            messagebox.showerror("Ошибка", "Неправильный формат даты. Используйте dd/mm/yyyy")
             return
         
         # Обработка диапазона дат
@@ -61,14 +61,14 @@ class mailingApp(tk.Tk):
             if found_data:
                 self.result_text.insert(tk.END, f"\nИнформация по дате {date_to_find}:\n")
                 for first_name, second_name, phone_number in found_data:
-                    SendMessege.send_whatsapp_message("+79963766314", str(first_name), str(second_name))
+                    SendMessage.send_whatsapp_message("+79963766314", str(first_name), str(second_name))
                     self.result_text.insert(tk.END, f"{first_name} {second_name}, Телефон: {phone_number}\n")
             else:
                 self.result_text.insert(tk.END, f"Нет данных по дате {date_to_find}.\n")
             
             # Переходим к следующему дню
             current_date += timedelta(days=1)
-        SendMessege.driverQuit()
+        SendMessage.driverQuit()
 
     def search_data(self, target_date):
         """Поиск данных по заданной дате."""
