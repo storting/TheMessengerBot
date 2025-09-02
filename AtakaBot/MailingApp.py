@@ -1,8 +1,21 @@
 import tkinter as tk
 from tkinter import messagebox
 from datetime import datetime, timedelta
-import codecs
+import os
+import sys
 import SendMessage as SendMessage
+
+try:
+    # Получаем реальный путь к исполняемому файлу
+    EXECUTABLE_PATH = os.path.realpath(sys.executable)
+except OSError:
+    print("Ошибка определения пути к исполняемому файлу.")
+    sys.exit(1)
+
+# Поднимаемся на уровень вверх к родительской директории
+PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(EXECUTABLE_PATH)))  
+
+DATA_DIR = os.path.join(PROJECT_DIR, 'dataBase')
 
 class mailingApp(tk.Tk):
     def __init__(self):
@@ -61,7 +74,7 @@ class mailingApp(tk.Tk):
             if found_data:
                 self.result_text.insert(tk.END, f"\nИнформация по дате {date_to_find}:\n")
                 for first_name, second_name, phone_number in found_data:
-                    SendMessage.send_whatsapp_message("+79963766314", str(first_name), str(second_name))
+                    SendMessage.send_whatsapp_message(phone_number, str(first_name), str(second_name))
                     self.result_text.insert(tk.END, f"{first_name} {second_name}, Телефон: {phone_number}\n")
             else:
                 self.result_text.insert(tk.END, f"Нет данных по дате {date_to_find}.\n")
@@ -73,7 +86,7 @@ class mailingApp(tk.Tk):
     def search_data(self, target_date):
         """Поиск данных по заданной дате."""
         found_data = []
-        with open('dataBase', encoding='utf-8') as file:
+        with open(DATA_DIR, encoding='utf-8') as file:
             for line in file:
                 data_list = eval(line.strip())
                 if len(data_list) >= 5 and data_list[0].strip() == target_date:
