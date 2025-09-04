@@ -10,18 +10,18 @@ from tkinter import messagebox, scrolledtext
 import os
 import sys
 
-try:
-    # Получаем реальный путь к исполняемому файлу
-    EXECUTABLE_PATH = os.path.realpath(sys.executable)
-except OSError:
-    print("Ошибка определения пути к исполняемому файлу.")
-    sys.exit(1)
+def resource_path(relative_path):
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
 
-# Поднимаемся на уровень вверх к родительской директории
-PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(EXECUTABLE_PATH)))  
+    return os.path.join(base_path, relative_path)
 
-TOKEN_DIR = os.path.join(PROJECT_DIR, 'TOKEN\\token.json')
-CREDENTIALS_DIR = os.path.join(PROJECT_DIR, 'TOKEN\\credentials.json')
+TOKEN_DIR = resource_path(r'TOKEN\token.json')
+CREDENTIALS_DIR = resource_path(r'TOKEN\credentials.json')
+DATAbASE_DIR = resource_path(r'DataBase')
 
 class dataApp(tk.Tk):
     def __init__(self):
@@ -56,8 +56,8 @@ class dataApp(tk.Tk):
 
     def load_saved_data(self):
         """Проверяем наличие файла с данными и показываем их, если они есть."""
-        if os.path.exists('DataBase'):
-            with codecs.open('DataBase', 'r', encoding='utf-8') as file:
+        if os.path.exists(resource_path('DataBase')):
+            with codecs.open(resource_path('DataBase'), 'r', encoding='utf-8') as file:
                 saved_data = file.readlines()
                 if saved_data:
                     self.output_text.config(state=tk.NORMAL)
@@ -104,7 +104,7 @@ class dataApp(tk.Tk):
             self.values = result.get('values', [])
 
             # Сохраняем данные в файл
-            with codecs.open('DataBase', 'w', encoding='utf-8') as file:
+            with codecs.open(DATAbASE_DIR, 'w', encoding='utf-8') as file:
                 for row in self.values:
                     if len(row) > 13 and row[13]:  
                         filtered_row = row[:9] + row[11:]

@@ -1,62 +1,51 @@
 import os
-import subprocess
-import psutil
-from time import sleep
+import threading
 import sys
+import time
+from ctypes import windll
 
-try:
-    # Получаем реальный путь к исполняемому файлу
-    EXECUTABLE_PATH = os.path.realpath(sys.executable)
-except OSError:
-    print("Ошибка определения пути к исполняемому файлу.")
-    sys.exit(1)
+def run_script(script):
+    os.system(f'python {script}')
 
-# Поднимаемся на уровень вверх к родительской директории
-PROJECT_DIR = os.path.dirname(EXECUTABLE_PATH)
-PROJECT_DIR = os.path.dirname(PROJECT_DIR)
-
-VENV_PATH = os.path.join(PROJECT_DIR, 'venv')  # Предположим, .venv лежит в корневом каталоге проекта
-
-# Определение полного пути к интерпретатору Python в виртуальной среде
-PYTHON_EXE = os.path.join(VENV_PATH, 'Scripts', 'python.exe')
-
-# Проверяем наличие интерпретатора Python
-if not os.path.isfile(PYTHON_EXE):
-    raise FileNotFoundError(f"Файл {PYTHON_EXE} не найден.")
-
-# Создание нового окружения для запуска приложений
-new_env = dict(os.environ)
-new_env['PATH'] = f"{VENV_PATH}\\Scripts;{os.getenv('PATH')}"  # Обновляем PATH для виртуального окружения
-
-def start_app(file_name):
-    p = subprocess.Popen([PYTHON_EXE, file_name], env=new_env)
-    return p
-
-def check_process(pid):
+def resource_path(relative_path):
     try:
-        proc = psutil.Process(pid)
-        return proc.is_running()
-    except psutil.NoSuchProcess:
-        return False
+        # PyInstaller создает временную папку и сохраняет путь в _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
 
-if __name__ == "__main__":
-    # Запуск двух приложений в отдельных процессах
-    mailing_proc = start_app(f'{PROJECT_DIR}\MailingApp.py')
-    data_proc = start_app(f'{PROJECT_DIR}\DataApp.py')
+    return os.path.join(base_path, relative_path)
 
-    # Сохраняем PID обоих процессов
-    mail_pid = mailing_proc.pid
-    data_pid = data_proc.pid
+def activate_window(hwnd):
+    """
+    Активирует окно, делая его передним фоном.
+    :param hwnd: дескриптор окна
+    """
+    windll.user32.SetForegroundWindow(hwnd)
 
-    try:
-        while True:
-            # Проверяем оба процесса
-            if not check_process(mail_pid) or not check_process(data_pid):
-                print("Один из процессов завершил свою работу.")
-                break
-            else:
-                sleep(1)  # Пауза перед повторной проверкой
-    finally:
-        print("Завершаемся...")
-        mailing_proc.terminate()
-        data_proc.terminate()
+# Функция для проверки активности потоков и остановки всего приложения
+def check_threads_and_exit():
+    threads = [thread1, thread2]
+    while any(t.is_alive() for t in threads):
+        time.sleep(0.1)
+    else:
+        print("Finished")
+        # Завершаем программу
+
+
+# Полные пути к файлам
+file1_path = resource_path(r'MainAppModul\DataApp.py')
+file2_path = resource_path(r'MainAppModul\MailingApp.py')
+
+with open('output.log', 'w') as f:
+    # Создаем потоки для выполнения скриптов
+    thread1 = threading.Thread(target=run_script, args=(file1_path,))
+    thread2 = threading.Thread(target=run_script, args=(file2_path,))
+    sys.stdout = f
+    sys.stderr = f
+    # Запускаем оба потока
+    thread1.start()
+    thread2.start()
+
+    # Ждем завершения любых потоков
+    check_threads_and_exit()

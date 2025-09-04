@@ -3,19 +3,16 @@ from tkinter import messagebox
 from datetime import datetime, timedelta
 import os
 import sys
-import SendMessage as SendMessage
+import SupportAppModule.SendMessage as SendMessage
+def resource_path(relative_path):
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
 
-try:
-    # Получаем реальный путь к исполняемому файлу
-    EXECUTABLE_PATH = os.path.realpath(sys.executable)
-except OSError:
-    print("Ошибка определения пути к исполняемому файлу.")
-    sys.exit(1)
+    return os.path.join(base_path, relative_path)
 
-# Поднимаемся на уровень вверх к родительской директории
-PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(EXECUTABLE_PATH)))  
-
-DATA_DIR = os.path.join(PROJECT_DIR, 'dataBase')
+DATAbASE_DIR = resource_path('DataBase')
 
 class mailingApp(tk.Tk):
     def __init__(self):
@@ -43,7 +40,7 @@ class mailingApp(tk.Tk):
         self.result_text.grid(row=3, columnspan=2)
 
     def process_dates(self):
-        SendMessage.driverOpen()
+        SendMessage.DriverHandler.open()
         """Обработка вводимых дат и отправка сообщений."""
         # Получаем введённые даты
         start_date_str = self.entry_start.get()
@@ -74,19 +71,19 @@ class mailingApp(tk.Tk):
             if found_data:
                 self.result_text.insert(tk.END, f"\nИнформация по дате {date_to_find}:\n")
                 for first_name, second_name, phone_number in found_data:
-                    SendMessage.send_whatsapp_message(phone_number, str(first_name), str(second_name))
+                    SendMessage.MessageSend.send_whatsapp_message(phone_number, str(first_name), str(second_name))
                     self.result_text.insert(tk.END, f"{first_name} {second_name}, Телефон: {phone_number}\n")
             else:
                 self.result_text.insert(tk.END, f"Нет данных по дате {date_to_find}.\n")
             
             # Переходим к следующему дню
             current_date += timedelta(days=1)
-        SendMessage.driverQuit()
+        SendMessage.DriverHandler.close()
 
     def search_data(self, target_date):
         """Поиск данных по заданной дате."""
         found_data = []
-        with open(DATA_DIR, encoding='utf-8') as file:
+        with open(DATAbASE_DIR, encoding='utf-8') as file:
             for line in file:
                 data_list = eval(line.strip())
                 if len(data_list) >= 5 and data_list[0].strip() == target_date:
