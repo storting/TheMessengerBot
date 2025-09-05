@@ -1,7 +1,4 @@
-import os
-import threading
-import sys
-import time
+import os, sys, time, threading
 from ctypes import windll
 
 def run_script(script):
@@ -9,7 +6,6 @@ def run_script(script):
 
 def resource_path(relative_path):
     try:
-        # PyInstaller создает временную папку и сохраняет путь в _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
         base_path = os.path.abspath(".")
@@ -32,20 +28,22 @@ def check_threads_and_exit():
         print("Finished")
         # Завершаем программу
 
-
 # Полные пути к файлам
-file1_path = resource_path(r'MainAppModul\DataApp.py')
-file2_path = resource_path(r'MainAppModul\MailingApp.py')
+file1_path = resource_path(r'src\MainAppModul\DataApp.py')
+file2_path = resource_path(r'src\MainAppModul\MailingApp.py')
 
-with open('output.log', 'w') as f:
+if __name__ == "__main__":
+    sys.stdout = open('output.log', 'w')  # Лог стандартного вывода
+    sys.stderr = open('errors.log', 'w')  # Лог ошибок
     # Создаем потоки для выполнения скриптов
     thread1 = threading.Thread(target=run_script, args=(file1_path,))
     thread2 = threading.Thread(target=run_script, args=(file2_path,))
-    sys.stdout = f
-    sys.stderr = f
-    # Запускаем оба потока
-    thread1.start()
-    thread2.start()
+    try:
+        thread1.start()
+        thread2.start()
+    except:
+        print("Программа не запущена!(")
+        input("Нажмите Enter для выхода...")
 
     # Ждем завершения любых потоков
     check_threads_and_exit()

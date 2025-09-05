@@ -4,15 +4,18 @@ from datetime import datetime, timedelta
 import os
 import sys
 import SupportAppModule.SendMessage as SendMessage
+
 def resource_path(relative_path):
     try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.abspath("..")
 
     return os.path.join(base_path, relative_path)
 
-DATAbASE_DIR = resource_path('DataBase')
+
+DATAbASE_DIR = resource_path(r'Datas\DataBase')
 
 class mailingApp(tk.Tk):
     def __init__(self):

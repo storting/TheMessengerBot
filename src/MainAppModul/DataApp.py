@@ -1,14 +1,13 @@
 from __future__ import print_function
-import os.path
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-import codecs
 import tkinter as tk
 from tkinter import messagebox, scrolledtext
-import os
-import sys
+from datetime import datetime
+import os, sys, codecs, os.path
+
 
 def resource_path(relative_path):
     try:
@@ -19,15 +18,15 @@ def resource_path(relative_path):
 
     return os.path.join(base_path, relative_path)
 
-TOKEN_DIR = resource_path(r'TOKEN\token.json')
-CREDENTIALS_DIR = resource_path(r'TOKEN\credentials.json')
-DATAbASE_DIR = resource_path(r'DataBase')
+TOKEN_DIR = resource_path(r'Datas\TOKEN\token.json')
+CREDENTIALS_DIR = resource_path(r'Datas\TOKEN\credentials.json')
+DATAbASE_DIR = resource_path(r'Datas\DataBase')
 
 class dataApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Просмотрщик Google Таблиц")
-        self.geometry("1000x600")  # Устанавливаем размер окна
+        self.geometry("1200x600")  # Устанавливаем размер окна
         self.creds = None
         self.values = []
         self.create_widgets()
@@ -38,14 +37,10 @@ class dataApp(tk.Tk):
         label_frame = tk.LabelFrame(self, text="Загрузка данных из Google Таблицы", font=("Arial", 12))
         label_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-        # Поле для отображения данных
-        self.output_text = scrolledtext.ScrolledText(label_frame, wrap=tk.WORD, state=tk.DISABLED, bg="#F5F5F5", fg="#333", font=("Helvetica", 10))
-        self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-        # Кнопка для принудительного обновления данных
-        button_load = tk.Button(label_frame, text="Обновить данные", command=self.fetch_spreadsheet_data, font=("Arial", 10))
-        button_load.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
-                
+        # Поле для отображения log
+        self.output_text_log = scrolledtext.ScrolledText(wrap=tk.WORD, state=tk.DISABLED, bg="#FFFFFF", fg="#333", font=("Helvetica", 8), width=50)
+        self.output_text_log.pack(side=tk.LEFT, fill=tk.Y, anchor=tk.SE)
+        
         # Поле для ввода сслыки на таблицу
         self.entry_ID_google_tabs = tk.Entry(self, width=100)
         self.entry_ID_google_tabs.insert(0, "https://docs.google.com/spreadsheets/d/116w9l5Uwar_ve0J5J92UG4ByaQZsjvJr8fLq8wGsJMo/edit?gid=0#gid=0")
@@ -53,6 +48,16 @@ class dataApp(tk.Tk):
 
         self.label_ID_google_tabs = tk.Label(self, text="Введите сслыку на таблицу:")
         self.label_ID_google_tabs.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
+
+        # Кнопка для принудительного обновления данных
+        button_load = tk.Button(label_frame, text="Обновить данные", command=self.fetch_spreadsheet_data, font=("Arial", 10))
+        button_load.pack(side=tk.RIGHT, anchor=tk.SE, padx=10, pady=10)
+
+        # Поле для отображения данных
+        self.output_text = scrolledtext.ScrolledText(label_frame, wrap=tk.WORD, state=tk.DISABLED, bg="#F5F5F5", fg="#333", font=("Helvetica", 10))
+        self.output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        
+        
 
     def load_saved_data(self):
         """Проверяем наличие файла с данными и показываем их, если они есть."""
@@ -105,6 +110,9 @@ class dataApp(tk.Tk):
 
             # Сохраняем данные в файл
             with codecs.open(DATAbASE_DIR, 'w', encoding='utf-8') as file:
+                now = datetime.now()
+                formatted_time = now.strftime("%d.%m %H:%M:%S")
+                file.write(str(formatted_time) + "\n")
                 for row in self.values:
                     if len(row) > 13 and row[13]:  
                         filtered_row = row[:9] + row[11:]
@@ -127,9 +135,17 @@ class dataApp(tk.Tk):
             for idx, row in enumerate(self.values):
                 if len(row) > 13 and row[13]:  
                     filtered_row = row[:9] + row[11:]
-                    self.output_text.insert(tk.END, f'{idx}. {filtered_row}\n\n')
+                    self.output_text.insert(tk.END, f'{filtered_row}\n\n')
             self.output_text.config(state=tk.DISABLED)
-            print("Data upload successful")
+            self.loging_insert()
+
+    def loging_insert(self):
+        now = datetime.now()
+        formatted_time = now.strftime("%d.%m %H:%M:%S")
+        self.output_text_log.config(state=tk.NORMAL)
+        self.output_text_log.insert(tk.END, f'Data upload successful!\n \t{formatted_time}\n')
+        self.output_text_log.config(state=tk.DISABLED)
+        print("Data upload successful")
 
     def extract_id(self):
         url = self.entry_ID_google_tabs.get() 
