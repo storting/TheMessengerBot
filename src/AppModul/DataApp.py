@@ -14,13 +14,13 @@ def resource_path(relative_path):
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath("..")
+        base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
 
-TOKEN_DIR = resource_path(r'Datas\TOKEN\token.json')
-CREDENTIALS_DIR = resource_path(r'Datas\TOKEN\credentials.json')
-DATAbASE_DIR = resource_path(r'Datas\DataBase')
+TOKEN_DIR = resource_path(r'_internal\Datas\TOKEN\token.json')
+CREDENTIALS_DIR = resource_path(r'_internal\Datas\TOKEN\credentials.json')
+DATAbASE_DIR = resource_path(r'_internal\Datas\DataBase')
 
 class dataApp(tk.Tk):
     def __init__(self):

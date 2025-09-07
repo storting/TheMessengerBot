@@ -8,8 +8,11 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from pathlib import Path
-from SupportAppModule.MessageCraft import Message
-import time, pyperclip
+import time, pyperclip, os, sys
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+from MessageCraft import Message
 
 #ПУТЬ К ПРОФИЛЮ
 home_path = str(Path.home())
@@ -41,15 +44,27 @@ class MessageSend:
         pyperclip.copy(message)
         try:
             wait = WebDriverWait(driver, 60)
+            main_container = wait.until(
+                EC.visibility_of_element_located((By.XPATH, '//div[@id="main"]'))
+            )
 
-            textbox = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]//footer//div[@contenteditable="true"]')))
-            textbox.click()
-            textbox.send_keys(Keys.CONTROL, 'v')
-            textbox.send_keys("""
-                            """)
-            time.sleep(2)
-            print("Сообщение успешно отправлено!")
-
+            # Использование точного селектора для реальных сообщений
+            messages_xpath = './/div[@class="x78zum5 xdt5ytf"]'
+            message_elements = main_container.find_elements(By.XPATH, messages_xpath)
+            if len(message_elements) <= 0:
+                print(len(message_elements))
+                print("Пустой чат, начинаю отправку сообщения!")
+                textbox = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]//footer//div[@contenteditable="true"]')))
+                textbox.click()
+                textbox.send_keys(Keys.CONTROL, 'v')
+                textbox.send_keys("""
+                                """)
+                time.sleep(2)
+                print("Сообщение успешно отправлено!")
+            else:
+                print("В активном чате уже есть сообщения.")
         except Exception as e:
             print(f"Произошла ошибка: {e}")
 
+    def find_message_history():
+        return

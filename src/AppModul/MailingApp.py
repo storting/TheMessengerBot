@@ -3,19 +3,26 @@ from tkinter import messagebox
 from datetime import datetime, timedelta
 import os
 import sys
-import SupportAppModule.SendMessage as SendMessage
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+import SendMessage as SendMessage
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if root_dir not in sys.path:
+    sys.path.insert(0, root_dir)
+from rebort import RebortSystem 
 
 def resource_path(relative_path):
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath("..")
+        base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
 
 
-DATAbASE_DIR = resource_path(r'Datas\DataBase')
+DATAbASE_DIR = resource_path(r'_internal\Datas\DataBase')
 
 class mailingApp(tk.Tk):
     def __init__(self):
@@ -33,14 +40,19 @@ class mailingApp(tk.Tk):
         self.entry_end = tk.Entry(self)
         self.entry_end.insert(0, "01/01/2022")
         button_process = tk.Button(self, text="Разослать", command=self.process_dates)
+        button_rebort = tk.Button(self, text="Открыть WA", command=self.open_rebort_system)
+        self.entry_num = tk.Entry(self)
+        self.entry_num.insert(tk.END, "+79137898373")
 
         # Расположение элементов
         label_start.grid(row=0, column=0, sticky="w")
         self.entry_start.grid(row=0, column=1)
         label_end.grid(row=1, column=0, sticky="w")
         self.entry_end.grid(row=1, column=1)
-        button_process.grid(row=2, columnspan=2)
-        self.result_text.grid(row=3, columnspan=2)
+        button_process.grid(row=2, column=0)
+        button_rebort.grid(row=2, column=1)
+        self.entry_num.grid(row=3, columnspan=2, padx=3, pady=3)
+        self.result_text.grid(row=4, columnspan=2)
 
     def process_dates(self):
         SendMessage.DriverHandler.open()
@@ -74,14 +86,17 @@ class mailingApp(tk.Tk):
             if found_data:
                 self.result_text.insert(tk.END, f"\nИнформация по дате {date_to_find}:\n")
                 for first_name, second_name, phone_number in found_data:
-                    SendMessage.MessageSend.send_whatsapp_message(phone_number, str(first_name), str(second_name))
+                    SendMessage.MessageSend.send_whatsapp_message(self.entry_num.get(), str(first_name), str(second_name))
                     self.result_text.insert(tk.END, f"{first_name} {second_name}, Телефон: {phone_number}\n")
             else:
                 self.result_text.insert(tk.END, f"Нет данных по дате {date_to_find}.\n")
             
             # Переходим к следующему дню
             current_date += timedelta(days=1)
-        #SendMessage.DriverHandler.close()
+        SendMessage.DriverHandler.close()
+
+    def open_rebort_system(self):
+        RebortSystem.open()
 
     def search_data(self, target_date):
         """Поиск данных по заданной дате."""
