@@ -14,7 +14,7 @@ def resource_path(relative_path):
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath(".")
+        base_path = os.path.abspath("..")
 
     return os.path.join(base_path, relative_path)
 
@@ -110,9 +110,6 @@ class dataApp(tk.Tk):
 
             # Сохраняем данные в файл
             with codecs.open(DATAbASE_DIR, 'w', encoding='utf-8') as file:
-                now = datetime.now()
-                formatted_time = now.strftime("%d.%m %H:%M:%S")
-                file.write(str(formatted_time) + "\n")
                 for row in self.values:
                     if len(row) > 13 and row[13]:  
                         filtered_row = row[:9] + row[11:]

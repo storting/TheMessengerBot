@@ -29,16 +29,17 @@ def check_threads_and_exit():
         # Завершаем программу
 
 # Полные пути к файлам
-file1_path = resource_path(r'lib\DataApp.py')
-file2_path = resource_path(r'lib\MailingApp.py')
+file1_path = resource_path(r'MainAppModul\DataApp.py')
+file2_path = resource_path(r'MainAppModul\MailingApp.py')
 
 if __name__ == "__main__":
     sys.stdout = open('output.log', 'w')  # Лог стандартного вывода
     sys.stderr = open('errors.log', 'w')  # Лог ошибок
-    # Создаем потоки для выполнения скриптов
-    thread1 = threading.Thread(target=run_script, args=(file1_path,))
-    thread2 = threading.Thread(target=run_script, args=(file2_path,))
     try:
+        # Создаем потоки для выполнения скриптов
+        thread1 = threading.Thread(target=run_script, args=(file1_path,))
+        thread2 = threading.Thread(target=run_script, args=(file2_path,))
+
         thread1.start()
         thread2.start()
     except:

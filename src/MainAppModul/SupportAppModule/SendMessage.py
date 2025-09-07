@@ -41,6 +41,7 @@ class MessageSend:
         pyperclip.copy(message)
         try:
             wait = WebDriverWait(driver, 60)
+
             textbox = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]//footer//div[@contenteditable="true"]')))
             textbox.click()
             textbox.send_keys(Keys.CONTROL, 'v')
@@ -48,6 +49,7 @@ class MessageSend:
                             """)
             time.sleep(2)
             print("Сообщение успешно отправлено!")
+
         except Exception as e:
             print(f"Произошла ошибка: {e}")
 

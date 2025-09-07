@@ -21,7 +21,7 @@ class mailingApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Информация по датам и рассылка")
-        self.result_text = tk.Text(self, height=40, width=50)
+        self.result_text = tk.Text(self, height=60, width=50)
         self.create_widgets()
 
     def create_widgets(self):
@@ -81,7 +81,7 @@ class mailingApp(tk.Tk):
             
             # Переходим к следующему дню
             current_date += timedelta(days=1)
-        SendMessage.DriverHandler.close()
+        #SendMessage.DriverHandler.close()
 
     def search_data(self, target_date):
         """Поиск данных по заданной дате."""
