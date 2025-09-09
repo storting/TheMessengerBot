@@ -25,16 +25,13 @@ textEnd = f"""
             PS: Желаю хорошего Вам дня, много улыбок, и счастливых моментов!
             """
 
-# Создаем объект морфологического анализа
 morph = pymorphy3.MorphAnalyzer()
 
 class Message:
-    # Конструктор класса
     def __init__(self, nameCustumer, nameBirthday):
         self.nameCustumer = nameCustumer
         self.nameBirthday = nameBirthday
 
-    # Проработка логики в зависимости от входных данных
     def ProcessingData(self):
         text = f"""Добрый день!☺🌺❤
         
@@ -48,14 +45,12 @@ class Message:
             if(self.nameBirthday != None and self.is_personal_name(self.nameBirthday)):
                 self.nameBirthday = self.decline_name(self.nameBirthday)
                 if(self.get_gender_name(self.nameBirthday) == 1):
-                    #print(self.nameCustumer, "\t", self.nameBirthday)
                     text = f"""*{self.nameCustumer.title()}* добрый день!☺🌺❤
                     Вас беспокоит Владислав администратор лазертаг клуба АТАКА 🔫🧨на Троллейной 37🫡
                     
                     Не за горами день рождения Вашего сына *{self.nameBirthday.title()}*🎂❤, _вы еще не думали над подарком🎁, как и где будете отмечать?🎈🎊🎉_
                                 """
                 elif(self.get_gender_name(self.nameBirthday) == 0):
-                    #print(self.nameCustumer, "\t", self.nameBirthday)
                     text = f"""*{self.nameCustumer.title()}* добрый день!☺🌺❤
                     
                     Вас беспокоит Владислав администратор лазертаг клуба АТАКА 🔫🧨на Троллейной 37🫡
@@ -63,7 +58,6 @@ class Message:
                     Не за горами день рождения Вашей дочери *{self.nameBirthday.title()}*🎂❤, _вы еще не думали над подарком🎁, как и где будете отмечать?🎈🎊🎉_
                                 """
             else:
-                #print(self.nameCustumer, "\t", self.nameBirthday)
                 text = f"""
                 *{self.nameCustumer.title()}* добрый день!☺🌺❤
                 
@@ -72,7 +66,6 @@ class Message:
                 Скоро пора переменых и первых шагов!🎈🎊Мы можем помочь этому событию запомнитсья☺🌺
                             """
         else:
-            #print(self.nameCustumer, "\t", self.nameBirthday)
             text = f"""
             Добрый день!☺🌺❤
             
@@ -87,13 +80,11 @@ class Message:
         return self.final_text
 
     def is_personal_name(self, word):
-        #Проверка имя это или нет
         parsed_word = morph.parse(word)[0]
 
         return ('Name' in parsed_word.tag) or False
 
     def decline_name(self, name):
-        #Склонение и обрезка имени
         cleaned_text = re.sub(r'[^\u0400-\u04FF\s]', '', name)
         butyavka = morph.parse(cleaned_text.strip())[0]
         gent = butyavka.inflect({'gent'})
@@ -101,12 +92,10 @@ class Message:
         return gent.word
     
     def clean_name(self, name):
-        #Обрезка имени
         cleaned_text = re.sub(r'[^\u0400-\u04FF\s]', '', name)
         return cleaned_text
     
     def get_gender_name(self, name):
-        #Получение гендера у имени существительного
         parse_result = morph.parse(name)[0]
         normalForm = parse_result.normal_form
         return get_gender(normalForm)

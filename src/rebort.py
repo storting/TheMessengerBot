@@ -12,15 +12,14 @@ import time
 home_path = str(Path.home())
 PROFILE_PATH = Path(home_path, 'AppData', 'Local', 'Google', 'Chrome', 'User Data', 'AppProfile')
 
-
 class RebortSystem:
     def open():
         chrome_options = Options()
-        chrome_options.add_experimental_option("detach", True)  # Отключить автоматическое закрытие браузера
-        chrome_options.add_argument("--disable-extensions")  # Отключить расширения
-        chrome_options.add_argument("--disable-gpu")  # Отключить GPU ускорение
-        chrome_options.add_argument("--no-sandbox")  # Отключить песочницу
-        chrome_options.add_argument("--disable-dev-shm-usage")  # Отключить использование /dev/shm
+        chrome_options.add_experimental_option("detach", True)
+        chrome_options.add_argument("--disable-extensions")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
 
         if PROFILE_PATH:
             chrome_options.add_argument(f"--user-data-dir={PROFILE_PATH}")
@@ -31,5 +30,5 @@ class RebortSystem:
         link = f'https://web.whatsapp.com/'
         driver.get(link)
 
-        wait = WebDriverWait(driver, 60)  # Увеличьте время ожидания до 60 секунд
+        wait = WebDriverWait(driver, 60)
         textbox = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]//footer//div[@contenteditable="true"]')))

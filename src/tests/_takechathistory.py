@@ -2,7 +2,6 @@
 import sys
 import os
 
-# Добавляем путь к корню проекта
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from AppModul import SendMessage as SM

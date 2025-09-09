@@ -1,7 +1,6 @@
 import inspect
 import importlib.util
 
-# Попытка импорта модуля
 try:
     trees_module = importlib.import_module("importlib_resources.trees")
 except ModuleNotFoundError:

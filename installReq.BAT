@@ -1,2 +1,4 @@
+@echo off
 cd /d "%~dp0"
-pip install -r requirements.txt
+
+pip3 install -r requirements.txt

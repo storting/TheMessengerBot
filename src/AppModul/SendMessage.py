@@ -21,11 +21,9 @@ PROFILE_PATH = Path(home_path, 'AppData', 'Local', 'Google', 'Chrome', 'User Dat
 class DriverHandler: 
     def open():
         global driver
-
         chrome_options = Options()
         if PROFILE_PATH:
             chrome_options.add_argument(f"--user-data-dir={PROFILE_PATH}")
-        
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
     
@@ -35,36 +33,33 @@ class DriverHandler:
 
 class MessageSend:
     def send_whatsapp_message(phone_number, name1, name2):
+        log_filename = f"MessageLog_.txt"
+        log_file = open(log_filename, 'a', encoding='utf-8')
         message = Message(name1, name2).final_form_massage()
         try:
             link = f'https://web.whatsapp.com/send/?phone={phone_number}'
             driver.get(link)
         except:
-            print("Ссылка недействительна" + str(link))
+            log_file.write("Ссылка недействительна" + str(link) + "\n")
         pyperclip.copy(message)
         try:
             wait = WebDriverWait(driver, 60)
             main_container = wait.until(
                 EC.visibility_of_element_located((By.XPATH, '//div[@id="main"]'))
             )
-
-            # Использование точного селектора для реальных сообщений
             messages_xpath = './/div[@class="x78zum5 xdt5ytf"]'
             message_elements = main_container.find_elements(By.XPATH, messages_xpath)
-            if len(message_elements) <= 0:
-                print(len(message_elements))
-                print("Пустой чат, начинаю отправку сообщения!")
+            log_file.write(f'Сообщений в чате {phone_number} : {name1} == {len(message_elements)} \n\n')
+            if len(message_elements) == 0:
+                log_file.write("Пустой чат, начинаю отправку сообщения!\n")
                 textbox = wait.until(EC.visibility_of_element_located((By.XPATH, '//*[@id="main"]//footer//div[@contenteditable="true"]')))
                 textbox.click()
                 textbox.send_keys(Keys.CONTROL, 'v')
                 textbox.send_keys("""
                                 """)
                 time.sleep(2)
-                print("Сообщение успешно отправлено!")
+                log_file.write("Сообщение успешно отправлено!]\n")
             else:
-                print("В активном чате уже есть сообщения.")
+                log_file.write("В активном чате уже есть сообщения.\n")
         except Exception as e:
-            print(f"Произошла ошибка: {e}")
-
-    def find_message_history():
-        return
+            log_file.write(f"Произошла ошибка: {e}\n")

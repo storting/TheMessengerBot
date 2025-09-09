@@ -1,2 +1,4 @@
+@echo off
 cd /d "%~dp0"
-pip uninstall -r requirements.txt -y
+
+pip3 uninstall -r requirements.txt -y
